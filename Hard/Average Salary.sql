@@ -73,7 +73,6 @@ order by 1 desc
 
 
 
-
 CREATE TABLE employee (
   employee_id INT PRIMARY KEY,
   department_id INT
@@ -101,3 +100,21 @@ INSERT INTO salary (id, employee_id, amount, pay_date) VALUES
 (5, 2, 6000, '2017-02-28'),
 (6, 3, 8000, '2017-02-28');
 
+with t1 as (
+select e.department_id, date_format(pay_date, '%Y-%m') pay_year_month, 
+avg(amount) over(partition by date_format(pay_date, '%Y-%m'), e.department_id) dept_avg, 
+avg(amount) over(partition by date_format(pay_date, '%Y-%m')) comp_avg
+-- count(distinct s.employee_id) employee_cnt, avg(amount) avg_amt
+from salary s 
+join 
+employee e on s.employee_id = e.employee_id
+)
+
+select distinct pay_year_month, department_id, 
+case when dept_avg>comp_avg then "higher"
+when dept_avg = comp_avg then "same"
+else "lower"
+end as comparison
+from t1
+order by 1 desc
+;
