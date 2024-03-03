@@ -1,1 +1,1 @@
-Average Salary.sql: using two partition with different level will create duplicated record 
+Average Salary.sql: uisng partition output row lenght same as the original row lenght
