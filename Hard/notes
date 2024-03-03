@@ -1,1 +1,6 @@
 Average Salary.sql: uisng partition output row lenght same as the original row lenght
+Hard/Cumulative Salary.sql: cumulative sum using sum() over() beaware of the direction, the order should be begin value on top and end value at the bottom. 
+
+checking: 
+- join on keys, select keys (different table different col name) 
+- distinct ? 
