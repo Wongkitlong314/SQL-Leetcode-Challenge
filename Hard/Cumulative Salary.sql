@@ -62,3 +62,38 @@ from t1
 where month<recent_month
 order by 1, 2 desc
 
+ -- my solution
+CREATE TABLE salary (
+  id INT,
+  month INT,
+  salary INT,
+  PRIMARY KEY (id, month)
+);
+
+INSERT INTO salary (id, month, salary) VALUES
+(1, 1, 20),
+(2, 1, 20),
+(1, 2, 30),
+(2, 2, 30),
+(3, 2, 40),
+(1, 3, 40),
+(3, 3, 60),
+(1, 4, 60),
+(3, 4, 70);
+
+with cte as 
+-- most recent month = max(month)
+(select id, max(month) recent_month
+from salary
+group by id)
+
+select  
+s.id, month, sum(salary) over(partition by s.id order by month asc) sum
+from 
+  salary s 
+join 
+  cte c on s.month <> c.recent_month and s.id = c.id
+order by s.id asc, month desc 
+
+
+
