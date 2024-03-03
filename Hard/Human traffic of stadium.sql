@@ -49,3 +49,43 @@ LEFT JOIN (
             GROUP BY dates) AS b
 USING (dates)
 WHERE b.total > 2
+
+
+-- my solution
+CREATE TABLE stadium (
+  id INT PRIMARY KEY,
+  visit_date DATE,
+  people INT
+);
+
+-- Insert data into stadium table
+INSERT INTO stadium (id, visit_date, people) VALUES
+(1, '2017-01-01', 10),
+(2, '2017-01-02', 109),
+(3, '2017-01-03', 150),
+(4, '2017-01-04', 99),
+(5, '2017-01-05', 145),
+(6, '2017-01-06', 1455),
+(7, '2017-01-07', 199),
+(8, '2017-01-08', 188);
+
+with cte as
+(select
+    id, visit_date, people,
+    date_sub(visit_date, interval rn day) grp_id
+  from 
+    (select
+      id, visit_date, people, row_number() over(order by visit_date asc) as rn 
+    from 
+    stadium
+    where people >= 100) t 
+  )
+
+select id, visit_date, people 
+from   
+  cte 
+join (select grp_id from cte group by grp_id
+having count(visit_date) >= 3 ) cte2 on cte.grp_id = cte2.grp_id 
+;
+
+
