@@ -91,3 +91,61 @@ from exam join student
 using (student_id)
 where student_id != all(select student_id from t1)
 order by 1
+
+-- Create Student table
+CREATE TABLE Student (
+  student_id INT PRIMARY KEY,
+  student_name VARCHAR(255)
+);
+
+-- Insert data into Student table
+INSERT INTO Student (student_id, student_name) VALUES
+(1, 'Daniel'),
+(2, 'Jade'),
+(3, 'Stella'),
+(4, 'Jonathan'),
+(5, 'Will');
+
+-- Create Exam table
+CREATE TABLE Exam (
+  exam_id INT,
+  student_id INT,
+  score INT,
+  PRIMARY KEY (exam_id, student_id),
+  FOREIGN KEY (student_id) REFERENCES Student(student_id)
+);
+
+-- Insert data into Exam table
+INSERT INTO Exam (exam_id, student_id, score) VALUES
+(10, 1, 70),
+(10, 2, 80),
+(10, 3, 90),
+(20, 1, 80),
+(30, 1, 70),
+(30, 3, 80),
+(30, 4, 90),
+(40, 1, 60),
+(40, 2, 70),
+(40, 4, 80);
+
+
+with cte as 
+  (select student_id, min(score_h2l) score_h2l, min(score_l2h) score_l2h
+  from 
+    (select 
+      student_id, exam_id, 
+      dense_rank() over(partition by exam_id order by score desc) score_h2l,
+      dense_rank() over(partition by exam_id order by score asc) score_l2h
+    from exam) t 
+  group by student_id
+  )
+
+select t1.student_id, t2.student_name
+from 
+  cte t1 
+join 
+  student t2 
+  on t1.student_id = t2.student_id
+where score_h2l <> 1 and score_l2h <> 1 
+;
+
