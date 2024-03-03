@@ -59,3 +59,36 @@ from t1
 where rnk = 1
 group by 1
 order by 1
+
+
+
+
+
+
+CREATE TABLE Activity (
+  player_id INT,
+  device_id INT,
+  event_date DATE,
+  games_played INT,
+  PRIMARY KEY (player_id, device_id, event_date)
+);
+
+-- Insert data into Activity table
+INSERT INTO Activity (player_id, device_id, event_date, games_played) VALUES
+(1, 2, '2016-03-01', 5),
+(1, 2, '2016-03-02', 6),
+(2, 3, '2017-06-25', 1),
+(3, 1, '2016-03-01', 0),
+(3, 4, '2016-07-03', 5);
+
+select event_date, count(distinct player_id) as installs
+, round(count(if(date_add(event_date, interval 1 day) = event_date_lag, player_id, null)) / count(distinct player_id), 2) as Day1_retention
+from 
+  (select player_id
+    , event_date 
+    , lead(event_date) over(partition by player_id order by event_date asc) event_date_lag 
+    , rank() over(partition by player_id order by event_date asc) event_date_rank
+  from Activity 
+  ) t 
+where event_date_rank = 1 
+group by event_date
