@@ -72,7 +72,7 @@ INSERT INTO stadium (id, visit_date, people) VALUES
 with cte as
 (select
     id, visit_date, people,
-    date_sub(visit_date, interval rn day) grp_id
+    id - rn as grp_id
   from 
     (select
       id, visit_date, people, row_number() over(order by visit_date asc) as rn 
