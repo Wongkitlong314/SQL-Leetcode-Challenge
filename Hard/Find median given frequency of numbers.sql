@@ -27,3 +27,31 @@ from numbers)
 select avg(number) as median
 from t1
 where middle between (cum_sum - frequency) and cum_sum
+
+
+-- my solution
+CREATE TABLE freq (
+  Number INT,
+  Frequency INT
+);
+
+INSERT INTO freq (Number, Frequency) VALUES
+(0, 7),
+(1, 1),
+(2, 3),
+(3, 1);
+
+select * from freq;
+
+with cte as 
+(select sum(Frequency) / 2 as mid 
+from freq), 
+
+cte2 as (
+select number, frequency, sum(frequency) over(order by number) cum_sum
+from freq 
+)
+
+select avg(number) as median
+from cte t1 
+join cte2 t2 on t2.cum_sum between mid and mid + 1  
