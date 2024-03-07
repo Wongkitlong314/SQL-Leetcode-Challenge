@@ -60,3 +60,17 @@ GROUP BY spend_date, user_id) u
 ON p.platform = u.platform AND p.spend_date=u.spend_date
 
 GROUP BY p.spend_date, p.platform
+
+
+
+-- my solution
+with cte as (
+user_id | spend_date | platform | desktop amount | mobile amount 
+  )
+
+select spend_date, platform, sum(desktop_amount) as total_amount, count(distinct user_id) total_users
+from result_table 
+where platform = 'desktop' 
+
+union all 
+... 
